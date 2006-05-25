@@ -8,7 +8,7 @@ use Carp;
 use Imager();
 use List::Util qw/shuffle/;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # We want to avoid all possible confusions for the user: 0, upper and
 # lower-case 'o', lower-case 'l' and '1', 'j'
@@ -20,7 +20,7 @@ our $DEFAULT_TYPE         = 'png';
 our $DEFAULT_FONT_FACE    = 'Arial';        # For Win32
 our $DEFAULT_FONT_FILE    = 'Vera.ttf';     # For all other platforms
 our $DEFAULT_FONT_SIZE    = 20;
-our $DEFAULT_BGCOLOR      = '#f9e680';
+#our $DEFAULT_BGCOLOR      = '#f9e680';
 our $DEFAULT_CODE_LENGTH  = 6;
 
 # Instantiate a new object, and then call create_new_image which
@@ -72,10 +72,16 @@ sub create_new_image {
 
     $self->{code_length} = $options->{code_length} || $DEFAULT_CODE_LENGTH;
     $self->{font_size} = $options->{font_size} || $DEFAULT_FONT_SIZE;
-    $self->{bgcolor} = $options->{bgcolor} || $DEFAULT_BGCOLOR;
     
-    # Generate a confirmation code
-    $self->{code} = $self->_generate_code();
+    if ( defined $options->{code} ) {
+        $self->{code} = ref($options->{code}) eq 'CODE'
+            ? $options->{code}->()
+            : $options->{code}
+            ;
+    }
+    else {
+        $self->{code} = $self->_generate_code();
+    }
     
     my ($width, $height);
     if ( (exists $options->{width}) && (exists $options->{height}) ) {
@@ -87,7 +93,7 @@ sub create_new_image {
     else {
         $width
             = int($self->{font_size}*1.2) * $self->{code_length} + 20;
-        $height = $self->{font_size} + 10;
+        $height = $self->{font_size}*1.3 + 10;
     }
 
     $self->{image} = Imager->new(
@@ -95,6 +101,8 @@ sub create_new_image {
         ysize    => $height,
     ) or croak "Can't create image objct: $!";
 
+    # Background color
+    $self->_create_bgcolor();
     $self->{image}->box( filled => 1, color => $self->{bgcolor} );
 
     $self->_create_string();
@@ -104,7 +112,12 @@ sub create_new_image {
     $degrees = (qw/+ -/)[int(rand 2)] . $degrees;
     $self->{image}
         = $self->{image}->rotate(degrees => $degrees, back => $self->{bgcolor})
-            or croak "Can't create image objct: $!";
+            or croak $self->{image}->errstr;
+
+    $self->{image}->filter(type=>"gaussian", stddev=>1)
+        or croak $self->{image}->errstr;
+    $self->{image}->filter(type=>"noise", amount=>50, subtype=>0)
+        or croak $self->{image}->errstr;
 }
 
 # Return the code in a string
@@ -154,32 +167,25 @@ sub _generate_code {
     return $code;
 }
 
+# Create a random bgcolor
+sub _create_bgcolor {
+    my $self = shift;
+   
+    my @components = shuffle(
+        int(rand 100)+156, int(rand 100)+156, int(rand 100)+156
+    );
+    
+    $self->{bgcolor} = new Imager::Color(
+        shuffle(int(rand 100)+156, int(rand 100)+156, int(rand 100)+156)
+    );
+}
+
 # Create the funky string in the image
 sub _create_string {
     my $self = shift;
 
     my $image = $self->{image};
     my $code  = $self->{code};
-    
-    # Generate some colors
-    my @font_attrs;
-    for my $i(1 .. length($code)) {
-        my @colors;
-        
-        my $j = 0;
-        while ($j < 2) {
-            push @colors, int(rand 255)+1;
-            $j++;
-            
-            # TODO: ensure colors do no match backgroup too much
-        }
-        
-        push @font_attrs, {
-            red     => shift @colors,
-            green   => shift @colors,
-            blue    => shift @colors,
-        };
-    }
     
     # Render the font
     my $font;
@@ -196,14 +202,21 @@ sub _create_string {
 
     my @code_chars = split //, $code;
     my $pos_x = 10;
-    for my $i(0 .. length($code)-1) {
+    
+    # Get background color components for comparison with letter
+    # color components
+    my ($bg_red, $bg_green, $bg_blue) = $self->{bgcolor}->rgba();
+
+    my $i = 0;
+    while ($i < length($code) ) {
+
         my $color = Imager::Color->new(
-            $font_attrs[$i]{red}, $font_attrs[$i]{blue}, $font_attrs[$i]{green},
+            shuffle( int(rand 10)+1, int(rand 100)+1, int(rand 100)+1 )
         );
         
-        # Make sure the font size varies a bit (+-20%)
-        my $font_delta = int( rand int($self->{font_size}*0.2) )+1;
-        my $font_size = $self->{font_size} + ( (qw/+ -/)[int(rand 2)] . $font_delta );
+        # Make sure the font size grows sometimes a bit (20%)
+        my $font_growth = int( rand int($self->{font_size}*0.20) )+1;
+        my $font_size = $self->{font_size} + $font_growth;
 
         $image->align_string(
             font    => $font,
@@ -217,6 +230,8 @@ sub _create_string {
         ) or croak "Error inserting string: $!";
         
         $pos_x += $self->{font_size} + int(rand (int ($self->{font_size}/2)))+1;
+        
+        $i++;
     }
 }
 
@@ -235,8 +250,19 @@ to your web forms
     
     my $vc = Image::VisualConfirmation->new();
     
+    # ### Get code and image ####
+    
     print $vc->image_code;
+    
     my $image_data = $vc->image_data(type => 'png');
+    
+    # ### Work with the Imager object directly ###
+    
+    my $image = $vc->image;
+    $image->filter(type=>'turbnoise'):
+    
+    $vc->image->write(file => 'vc.jpg');
+    
 
 =head1 DESCRIPTION
 
@@ -255,6 +281,11 @@ When creating the random string, this module excludes the letters/digits
 which might be confused with each other, so that the user has a greater
 chance to not get angered with the challenge: C<0>, upper and lower-case
 C<o>; lower-case C<l> and C<1>; C<j>.
+
+This module is in many ways similar to L<Authen::Captcha>, but is uses
+L<Imager> instead of L<GD> and it features a different interface:
+it's simpler, just a lightweight wrapper around L<Imager>). Choose the
+module that better suits your needs.
 
 =head1 METHODS
 
@@ -300,10 +331,12 @@ in C</usr/share/fonts>.
 
 C<font_size>: the size of the characters, it defaults to C<20>.
 
-C<bgcolor>: the background color of the image to be created.
-
 C<code_length>: the length, in chars, of the visual code to generate at
 random; default is C<6>.
+
+C<code>: allows to provide a code to display on the image, instead
+of generating one at random. You can also pass a coderef of any sub
+that returns a string.
 
 C<width> and C<height>: if these 2 are provided, the image will be
 createt of that size (but rotation might then change it a bit);
@@ -361,11 +394,7 @@ and then work directly on the Imager object.
 
 =head1 TODO
 
-- Allow user to provide a code generated by himself, or a callback to
-a function which generates it.
-
-- Improve the visual challenge by adding image deformations and random
-backgroup colors.
+- Improve the visual challenge by adding image deformations.
 
 - Improve the synopsis with a L<CGI::Session> and a L<Catalyst> example.
 
@@ -374,10 +403,6 @@ backgroup colors.
 - Add more tests.
 
 - Implement argument forwarding to L<Imager> object for C<image_data>.
-
-=head1 BUGS
-
-- Well, it's version 0.01, you know... ;-)
 
 =head1 SEE ALSO
 
