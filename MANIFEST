@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Image-VisualConfirmation.t
+lib/Image/VisualConfirmation.pm
+lib/Image/VisualConfirmation/Vera.ttf
+META.yml                                 Module meta-data (added by MakeMaker)
