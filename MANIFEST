@@ -1,5 +1,6 @@
 Changes
 Makefile.PL
+Build.PL
 MANIFEST
 README
 t/Image-VisualConfirmation.t

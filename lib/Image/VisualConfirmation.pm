@@ -6,9 +6,10 @@ use warnings;
 
 use Carp;
 use Imager();
+use Path::Class();
 use List::Util qw/shuffle/;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # We want to avoid all possible confusions for the user: 0, upper and
 # lower-case 'o', lower-case 'l' and '1', 'j'
@@ -20,7 +21,6 @@ our $DEFAULT_TYPE         = 'png';
 our $DEFAULT_FONT_FACE    = 'Arial';        # For Win32
 our $DEFAULT_FONT_FILE    = 'Vera.ttf';     # For all other platforms
 our $DEFAULT_FONT_SIZE    = 20;
-#our $DEFAULT_BGCOLOR      = '#f9e680';
 our $DEFAULT_CODE_LENGTH  = 6;
 
 # Instantiate a new object, and then call create_new_image which
@@ -60,10 +60,12 @@ sub create_new_image {
     # Otherwise we search for the default, but only if we're not
     # on Windows (we'll use the font_face defined above in that case)
     elsif ( $^O !~ m/Win/xms ) {
-        my $font_file = __FILE__;
-
-        $font_file =~ s/\.pm\z//;
-        $font_file .= q{/} . $DEFAULT_FONT_FILE;
+        my $font_basedir = __FILE__;
+        $font_basedir =~ s/\.pm\z//;
+        
+        my $font_file = Path::Class::File->new(
+            $font_basedir, '/', $DEFAULT_FONT_FILE
+        );
 
         croak 'Error getting the default font file. Please specify one'
             if !-e $font_file;
@@ -142,14 +144,15 @@ sub image_data {
     croak "Arguments must be an hashref"
         if ( $options ) && ( ref($options) ne 'HASH' );
 
-    my $image_type = $options->{type} || $DEFAULT_TYPE;
+    # Supply a default image type if it's not already provided
+    $options->{type} = $options->{type} || $DEFAULT_TYPE;
     
     my $image = $self->{image};
     my $image_data;
     
     $image->write(
-        type => 'png',
-        data => \$image_data
+        data    => \$image_data,
+        %$options,
     ) or croak $image->errstr;
 
     return $image_data;
@@ -284,8 +287,8 @@ C<o>; lower-case C<l> and C<1>; C<j>.
 
 This module is in many ways similar to L<Authen::Captcha>, but is uses
 L<Imager> instead of L<GD> and it features a different interface:
-it's simpler, just a lightweight wrapper around L<Imager>). Choose the
-module that better suits your needs.
+it's simpler, just a lightweight wrapper around L<Imager>). And there's
+also L<GD::SecurityImage>. Choose the module that better suits your needs.
 
 =head1 METHODS
 
@@ -377,7 +380,7 @@ be used for direct output, i.e.:
     my $image_data = $vc->image_data;
     
     print $q->header(
-        -type   => 'image/png',
+        type   => 'image/png',
     );
 
     print $image_data;
@@ -385,24 +388,20 @@ be used for direct output, i.e.:
 There's an optional parameter, C<type>, which allows you to specify the
 format of the data you get. All formats supported by L<Imager> are
 valid:  C<png> (the default if you don't pass the parameter), C<jpeg>,
-C<gif>, C<tiff>, C<bmp>, C<tga>. Beware that C<gif> support is broken
-on some platforms (including mine): don't use it. L<Imager> also
-supports C<raw> format, but it has mandatory arguments: since argument
-forwarding is not (yet) implemented for this method, it's not supported.
-If you need to pass arguments to Imager, please use the C<image> method
-and then work directly on the Imager object.
+C<gif>, C<tiff>, C<bmp>, C<tga> and C<raw>. Beware that C<gif> support
+is broken on some platforms (including mine): don't use it. You can
+pass any additional parameter that Imager's C<write> method accepts,
+it will be forwarded: see L<Imager::Files> for more information.
 
 =head1 TODO
+
+- Make width and height actually work as expected.
 
 - Improve the visual challenge by adding image deformations.
 
 - Improve the synopsis with a L<CGI::Session> and a L<Catalyst> example.
 
 - Improve error handling with bad parameters.
-
-- Add more tests.
-
-- Implement argument forwarding to L<Imager> object for C<image_data>.
 
 =head1 SEE ALSO
 

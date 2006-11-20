@@ -1,11 +1,24 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Image-VisualConfirmation
-version:      0.02
-version_from: lib/Image/VisualConfirmation.pm
-installdirs:  site
+---
+name: Image-VisualConfirmation
+version: 0.03
+author:
+  - 'Michele Beltrame, C<mb@italpro.net>'
+abstract: |-
+  Add anti-spam visual confirmation/challenge
+  to your web forms
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
 requires:
-    Imager:                        0.48
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.17
+  Imager: 0.48
+  Path::Class: 0
+build_requires:
+  Test::Exception: 0
+provides:
+  Image::VisualConfirmation:
+    file: lib/Image/VisualConfirmation.pm
+    version: 0.03
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

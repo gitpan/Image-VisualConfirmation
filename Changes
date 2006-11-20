@@ -1,14 +1,19 @@
 Revision history for Perl extension Image::VisualConfirmation.
 
+0.03
+    - lotta more tests
+    - documentation improvements
+    - image method now forwards options to Imager write method
+      
 0.02  Thu May 25 2006
-	- background color is now random
-	- removed "bgcolor" useless attribute
-	- improved visibility of the text by limiting colors
-	- improved challenge by adding noise and sharpen filters to the
-	  image
-	- added support for "code" parameter
-	- improved documentation
-	- code cleaning
+    - background color is now random
+    - removed "bgcolor" useless attribute
+    - improved visibility of the text by limiting colors
+    - improved challenge by adding noise and sharpen filters to the
+      image
+    - added support for "code" parameter
+    - improved documentation
+    - code cleaning
 
 0.01  Thu May 25 2006
-	- original version
+    - original version
