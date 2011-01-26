@@ -1,5 +1,8 @@
 Revision history for Perl extension Image::VisualConfirmation.
 
+0.04
+    - fix tests to work with newer Imager
+
 0.03
     - lotta more tests
     - documentation improvements

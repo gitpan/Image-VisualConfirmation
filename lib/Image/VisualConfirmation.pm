@@ -9,7 +9,7 @@ use Imager();
 use Path::Class();
 use List::Util qw/shuffle/;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # We want to avoid all possible confusions for the user: 0, upper and
 # lower-case 'o', lower-case 'l' and '1', 'j'
@@ -195,11 +195,13 @@ sub _create_string {
     if ( exists $self->{font_file} ) {
         $font = Imager::Font->new(
             file  => $self->{font_file},
+            #type  => 'ft2',
         ) or croak "Font file not found: $!";
     }
     else {
         $font = Imager::Font->new(
             face  => $self->{font_face},
+            #type  => 'ft2',
         ) or croak "Font not found: $!";
     }
 

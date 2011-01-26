@@ -23,7 +23,7 @@ lives_ok { $vc->image_data() };
 lives_ok { $vc->image_data({ type => 'tga', compress => 1 }) };
 
 throws_ok { $vc->image_data({ type => 'notype' }) }
-    qr/format not supported/;
+    qr/format\s+(?:\'notype\'\s+) ?not\s+supported/xms;
 
 my $vc_image = $vc->image;
 isa_ok($vc_image, 'Imager');
