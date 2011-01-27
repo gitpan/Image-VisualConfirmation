@@ -9,7 +9,7 @@ use Imager();
 use Path::Class();
 use List::Util qw/shuffle/;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # We want to avoid all possible confusions for the user: 0, upper and
 # lower-case 'o', lower-case 'l' and '1', 'j'
@@ -189,19 +189,24 @@ sub _create_string {
 
     my $image = $self->{image};
     my $code  = $self->{code};
-    
+       
     # Render the font
     my $font;
     if ( exists $self->{font_file} ) {
-        $font = Imager::Font->new(
+        my %imager_params = (
             file  => $self->{font_file},
-            #type  => 'ft2',
+        );
+        if ( defined $self->{font_type} ) {
+            $imager_params{type} = $self->{font_type};
+        }
+
+        $font = Imager::Font->new(
+            %imager_params
         ) or croak "Font file not found: $!";
     }
     else {
         $font = Imager::Font->new(
             face  => $self->{font_face},
-            #type  => 'ft2',
         ) or croak "Font not found: $!";
     }
 
@@ -335,6 +340,13 @@ similar location, and you should have plenty of fonts to choose from
 in C</usr/share/fonts>.
 
 C<font_size>: the size of the characters, it defaults to C<20>.
+
+C<font_type>: it has been reported the font-type autodetection by
+L<Imager> doesn't always work, so you have the options to explicitly
+tell the the font type: available types depend on how L<Imager> is
+compiled on your system, but they should be C<tt>, C<t1>, C<w32>,
+C<ft2> or a subset of these. This parameter is only considered when
+C<font_file> is specified as well.
 
 C<code_length>: the length, in chars, of the visual code to generate at
 random; default is C<6>.
