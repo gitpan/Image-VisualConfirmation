@@ -1,6 +1,9 @@
 Revision history for Perl extension Image::VisualConfirmation.
 
-0.10005
+0.10007
+    - fix typos
+
+0.10006
     - switch to Dist::Zilla
     - new versioning scheme
     - fix tests at last, hopefully (by setting a 'ft2' DEFAULT_FONT_TYPE

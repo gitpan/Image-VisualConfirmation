@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker 6.31;
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'Add anti-spam CPATCHA ( visual confirmation/challenge) to your web forms.',
+  'ABSTRACT' => 'Add anti-spam CAPTCHA ( visual confirmation/challenge) to your web forms.',
   'AUTHOR' => 'Michele Beltrame <mb@italpro.net>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     'Path::Class' => '0.23',
     'Test::Exception' => '0'
   },
-  'VERSION' => '0.10006',
+  'VERSION' => '0.10007',
   'test' => {
     'TESTS' => 't/*.t'
   }

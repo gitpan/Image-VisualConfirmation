@@ -1,7 +1,7 @@
 package Image::VisualConfirmation;
 
 BEGIN {
-  $Image::VisualConfirmation::VERSION = '0.10006';
+  $Image::VisualConfirmation::VERSION = '0.10007';
 }
 
 use strict;
@@ -257,7 +257,7 @@ __END__
 
 =head1 NAME
 
-Image::VisualConfirmation - Add anti-spam CPATCHA ( visual
+Image::VisualConfirmation - Add anti-spam CAPTCHA ( visual
 confirmation/challenge) to your web forms.
 
 =head1 SYNOPSIS

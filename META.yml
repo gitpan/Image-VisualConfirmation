@@ -1,5 +1,5 @@
 ---
-abstract: 'Add anti-spam CPATCHA ( visual confirmation/challenge) to your web forms.'
+abstract: 'Add anti-spam CAPTCHA ( visual confirmation/challenge) to your web forms.'
 author:
   - 'Michele Beltrame <mb@italpro.net>'
 build_requires: {}
@@ -16,4 +16,4 @@ requires:
   Imager: 0.79
   Path::Class: 0.23
   Test::Exception: 0
-version: 0.10006
+version: 0.10007
