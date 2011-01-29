@@ -1,6 +1,9 @@
 package Image::VisualConfirmation;
 
-use 5.008;
+BEGIN {
+  $Image::VisualConfirmation::VERSION = '0.10006';
+}
+
 use strict;
 use warnings;
 
@@ -8,8 +11,6 @@ use Carp;
 use Imager();
 use Path::Class();
 use List::Util qw/shuffle/;
-
-our $VERSION = '0.05';
 
 # We want to avoid all possible confusions for the user: 0, upper and
 # lower-case 'o', lower-case 'l' and '1', 'j'
@@ -20,6 +21,7 @@ our @LETTERS = (
 our $DEFAULT_TYPE         = 'png';
 our $DEFAULT_FONT_FACE    = 'Arial';        # For Win32
 our $DEFAULT_FONT_FILE    = 'Vera.ttf';     # For all other platforms
+our $DEFAULT_FONT_TYPE    = 'ft2';          # For Vera.ttf
 our $DEFAULT_FONT_SIZE    = 20;
 our $DEFAULT_CODE_LENGTH  = 6;
 
@@ -55,6 +57,8 @@ sub create_new_image {
     if ( exists $options->{font_file} )
     {
         $self->{font_file} = $options->{font_file};
+
+        $self->{font_type} = $options->{font_type};
     }
     
     # Otherwise we search for the default, but only if we're not
@@ -70,6 +74,8 @@ sub create_new_image {
         croak 'Error getting the default font file. Please specify one'
             if !-e $font_file;
         $self->{font_file} = $font_file;
+
+        $self->{font_type} = $DEFAULT_FONT_TYPE;
     }
 
     $self->{code_length} = $options->{code_length} || $DEFAULT_CODE_LENGTH;
@@ -251,8 +257,8 @@ __END__
 
 =head1 NAME
 
-Image::VisualConfirmation - Add anti-spam visual confirmation/challenge
-to your web forms
+Image::VisualConfirmation - Add anti-spam CPATCHA ( visual
+confirmation/challenge) to your web forms.
 
 =head1 SYNOPSIS
 
@@ -296,6 +302,8 @@ This module is in many ways similar to L<Authen::Captcha>, but is uses
 L<Imager> instead of L<GD> and it features a different interface:
 it's simpler, just a lightweight wrapper around L<Imager>). And there's
 also L<GD::SecurityImage>. Choose the module that better suits your needs.
+
+An usage example is available in the I<examples> directory.
 
 =head1 METHODS
 
@@ -346,7 +354,9 @@ L<Imager> doesn't always work, so you have the options to explicitly
 tell the the font type: available types depend on how L<Imager> is
 compiled on your system, but they should be C<tt>, C<t1>, C<w32>,
 C<ft2> or a subset of these. This parameter is only considered when
-C<font_file> is specified as well.
+C<font_file> is specified as well. It is I<highly recommended> that
+you pass this parameter if you pass a C<font_file> (you might get
+I<font file not found> from L<Imager> errors otherwise).
 
 C<code_length>: the length, in chars, of the visual code to generate at
 random; default is C<6>.
@@ -428,7 +438,7 @@ Michele Beltrame, C<mb@italpro.net>
 =head1 LICENSE
 
 This library is free software, you can redistribute it and/or modify it
-under the same terms as Perl itself.
+under the same terms as Perl 5 itself.
 
 The Bitstream Vera font bundled with this distribution is copyrighted
 by Bitstream ( http://www.bitstream.com ) and distributed under its

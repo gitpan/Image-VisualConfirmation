@@ -1,24 +1,19 @@
 ---
-name: Image-VisualConfirmation
-version: 0.03
+abstract: 'Add anti-spam CPATCHA ( visual confirmation/challenge) to your web forms.'
 author:
-  - 'Michele Beltrame, C<mb@italpro.net>'
-abstract: |-
-  Add anti-spam visual confirmation/challenge
-  to your web forms
+  - 'Michele Beltrame <mb@italpro.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
 license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Imager: 0.48
-  Path::Class: 0
-build_requires:
-  Test::Exception: 0
-provides:
-  Image::VisualConfirmation:
-    file: lib/Image/VisualConfirmation.pm
-    version: 0.03
-generated_by: Module::Build version 0.2805
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Image-VisualConfirmation
+requires:
+  Imager: 0.79
+  Path::Class: 0.23
+  Test::Exception: 0
+version: 0.10006

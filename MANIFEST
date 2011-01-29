@@ -1,9 +1,12 @@
 Changes
-Makefile.PL
-Build.PL
+LICENSE
 MANIFEST
+META.yml
+Makefile.PL
 README
-t/Image-VisualConfirmation.t
+README.txt
+dist.ini
+examples/basic_example.pl
 lib/Image/VisualConfirmation.pm
 lib/Image/VisualConfirmation/Vera.ttf
-META.yml                                 Module meta-data (added by MakeMaker)
+t/Image-VisualConfirmation.t

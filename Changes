@@ -1,5 +1,13 @@
 Revision history for Perl extension Image::VisualConfirmation.
 
+0.10005
+    - switch to Dist::Zilla
+    - new versioning scheme
+    - fix tests at last, hopefully (by setting a 'ft2' DEFAULT_FONT_TYPE
+      for vera.ttf (thanks Franck Perrot for pointing the problem out)
+    - added recommendation to pass font_type if using custom font_file
+    - added sample usage in examples directory
+
 0.05
     - added the option to explictly specify font_type for
       a font_file (RT bug #61901) 
